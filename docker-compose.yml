@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  mysql-master:
+    container_name: mysql-master 
+    image: mysql:5.7.31
+    restart: always
+    ports:
+      - 13306:3306 
+    privileged: true
+    volumes:
+      # 这个只对mysql主从进行验证 没有持久化配置以及日志相关的映射
+      - $PWD/master/conf/my.cnf:/etc/mysql/my.cnf
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_general_ci',
+        '--max_connections=3000'
+    ]
+    networks:
+      - myweb
+      
+  mysql-slave:
+    container_name: mysql-slave 
+    image: mysql:5.7.31
+    restart: always
+    ports:
+      - 23306:3306 
+    privileged: true
+    volumes:
+      # 这个只对mysql主从进行验证 没有持久化配置以及日志相关的映射
+      - $PWD/slave/conf/my.cnf:/etc/mysql/my.cnf
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+    command: [
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_general_ci',
+        '--max_connections=3000'
+    ]
+    networks:
+      - myweb    
+
+networks:
+  myweb:
+    driver: bridge
